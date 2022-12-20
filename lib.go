@@ -1,55 +1,62 @@
 package pipe
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/kendfss/but"
 )
 
-// get data from stdin
-// panic on error
+func Stdin() *os.File {
+	f, err := os.Open("/dev/stdin")
+	but.Exiff(err, "pipe: %s", err)
+	return f
+}
+
+func Stdout() *os.File {
+	f, err := os.Open("/dev/stdout")
+	but.Exiff(err, "pipe: %s", err)
+	return f
+}
+
+func Stderr() *os.File {
+	f, err := os.Open("/dev/stderr")
+	but.Exiff(err, "pipe: %s", err)
+	return f
+}
+
+// get data from Stdin
 func Get() []byte {
-	var (
-		data []byte
-		err  error
-	)
+	// return Getf(os.Stdout)
+	return Getf(os.Stdin)
+}
 
-	if !Empty() {
-		data, err = ioutil.ReadAll(os.Stdin)
-		but.Must(err)
-	}
-
+// get data from a file
+// panic on error
+func Getf(f *os.File) []byte {
+	data, err := From(f)
+	but.Exiff(err, "pipe: %s", err)
 	return data
 }
 
-// get data, with an error from stdin
-func GetE() ([]byte, error) {
-	var data []byte
-	info, err := os.Stdin.Stat()
-	if err != nil {
-		return nil, err
-	}
-
-	if info.Size() > 0 {
-		data, err = ioutil.ReadAll(os.Stdin)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return data, nil
-}
-
-// check if stdin is empty
+// check if Stdin is empty
 func Empty() bool {
-	return Size() == 0
+	return Emptyf(os.Stdout)
 }
 
-// check size (in bytes) of stdin
-func Size() int64 {
-	info, err := os.Stdin.Stat()
-	but.Must(err)
+// check if a file is empty
+func Emptyf(f *os.File) bool {
+	return Sizef(f) == 0
+}
 
+// check size (in bytes) of Stdin
+func Size() int64 {
+	return Sizef(os.Stdout)
+}
+
+// check size (in bytes) of a file.
+// Exits if any Stat error is incurred error
+func Sizef(f *os.File) int64 {
+	info, err := f.Stat()
+	but.Exiff(err, "pipe: %s", err)
 	return info.Size()
 }

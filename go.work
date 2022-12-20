@@ -1,7 +1,0 @@
-go 1.18
-
-replace (
-	github.com/kendfss/but => ../but
-)
-
-use ../but
