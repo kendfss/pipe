@@ -40,17 +40,19 @@ func Getf(f *os.File) []byte {
 
 // check if Stdin is empty
 func Empty() bool {
-	return Emptyf(os.Stdout)
+	return Emptyf(os.Stdin)
 }
 
 // check if a file is empty
 func Emptyf(f *os.File) bool {
-	return Sizef(f) == 0
+	stat, err := f.Stat()
+	but.Exif(err)
+	return Loaded(stat)
 }
 
 // check size (in bytes) of Stdin
 func Size() int64 {
-	return Sizef(os.Stdout)
+	return Sizef(os.Stdin)
 }
 
 // check size (in bytes) of a file.
