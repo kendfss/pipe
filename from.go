@@ -9,6 +9,9 @@ import (
 func From(f *os.File) ([]byte, error) {
 	var data []byte
 	info, err := f.Stat()
+	if err != nil {
+		panic(err)
+	}
 	if err == nil {
 		if Loaded(info) {
 			data = make([]byte, info.Size())
@@ -35,5 +38,13 @@ func FromErr() ([]byte, error) {
 
 // Loaded checks if a file's status implies that it can be read from
 func Loaded(stat fs.FileInfo) bool {
+	return (stat.Mode() & os.ModeCharDevice) == 0
+}
+
+func Receiving() bool {
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		panic(err)
+	}
 	return (stat.Mode() & os.ModeCharDevice) == 0
 }
