@@ -1,21 +1,18 @@
 package pipe
 
 import (
+	"io"
 	"io/fs"
 	"os"
 )
 
 // Extract the bytes from a file
-func From(f *os.File) ([]byte, error) {
+func From(f fs.File) ([]byte, error) {
 	var data []byte
 	info, err := f.Stat()
-	if err != nil {
-		panic(err)
-	}
 	if err == nil {
 		if Loaded(info) {
-			data = make([]byte, info.Size())
-			_, err = f.Read(data)
+			data, err = io.ReadAll(f)
 		}
 	}
 	return data, err
