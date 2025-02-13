@@ -38,6 +38,7 @@ func Loaded(stat fs.FileInfo) bool {
 	return (stat.Mode() & os.ModeCharDevice) == 0
 }
 
+// Receiving reports whether or not we're receiving on stdin
 func Receiving() bool {
 	stat, err := os.Stdin.Stat()
 	if err != nil {

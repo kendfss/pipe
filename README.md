@@ -53,7 +53,7 @@ import "github.com/kendfss/pipe"
 
 func main() {
     if data := pipe.Get(); data != nil {
-        processInput(data) // this exercise is left to the reader
+        // this section is left as an exercise for the reader
     } 
 }
 ```

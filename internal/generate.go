@@ -17,7 +17,18 @@ func main() {
 	for _, todo := range todos {
 		f := mustv(os.Create(fname(todo)))
 		defer f.Close()
-		must(template.Must(template.New("").Parse(templateString)).Execute(f, struct {
+		must(template.Must(template.New("").Funcs(template.FuncMap{
+			"mirror": func(s string) string {
+				switch s {
+				case "err":
+					return "out"
+				case "out":
+					return "err"
+				default:
+					panic(fmt.Errorf("%q is not a supported output", s))
+				}
+			},
+		}).Parse(templateString)).Execute(f, struct {
 			Date time.Time
 			Todo string
 		}{
@@ -39,6 +50,12 @@ import (
 	"github.com/kendfss/pipe"
 )
 
+var mirrorFlag bool
+
+func init() {
+	flag.BoolVar(&mirrorFlag, "m", false, "also write output to std{{ mirror .Todo }}")
+}
+
 func main() {
 	flag.Parse()
 	input := pipe.Get()
@@ -47,8 +64,12 @@ func main() {
 		if len(input) == 0 {
 			flag.Usage()
 		}
+		input = append(input, '\n')
 	}
-	os.Std{{ .Todo }}.Write(append(input, '\n'))
+	os.Std{{ .Todo }}.Write(input)
+	if mirrorFlag {
+		os.Std{{ mirror .Todo }}.Write(input)
+	}
 }
 
 `
